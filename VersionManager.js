@@ -714,7 +714,7 @@ define(['jimu/shared/BaseVersionManager'],
           return oldConfig;
         }
       }, {
-        version: '2.19',
+        version: '2.16',
         upgrader: function(oldConfig) {
           if(!oldConfig || !oldConfig.dijits){
             return oldConfig;
