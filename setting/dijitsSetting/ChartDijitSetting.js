@@ -103,6 +103,8 @@ define([
     //     format:{type:int | float, digitSeparator: boolean}
     //     textStyle{color, fontSize}
     //     nameTextStyle{color, fontSize}
+    //     min: number
+    //     max: number
     //   legend:
     //     show:boolean (Whether to display the legend)
     //     testStyle:{color, fontSize}
@@ -291,6 +293,7 @@ define([
       var clusterField = config.data.clusterField;
       clusterField = clusterField || this.clusterFieldSelect.get('value');
       this._updateNumberOptionDisplay(clusterField);
+      this._updateAxisRangeSettingDisplay()
     },
 
     _setDataSourceToDijits: function(dataSource) {
@@ -383,6 +386,7 @@ define([
       utils.updateOptions(this.clusterFieldSelect, null, clusterField);
       this._updateDateOptionContainerDisplay();
       this._updateNumberOptionDisplay(clusterField);
+      this._updateAxisRangeSettingDisplay()
       //clear value fields selected field
       this.valueFields.uncheckAllFields();
       //reset chart sort
@@ -475,7 +479,7 @@ define([
 
       //legend, xAxis, yAxis, dataLabel
       var show, title, nameTextStyle, titleColor, textStyle, labelColor,
-        labelSize, format, formatType, digitSeparator;
+        labelSize, format, formatType, digitSeparator, xMin, xMax, yMin, yMax;
 
       show = legend && legend.show;
       textStyle = legend && legend.textStyle;
@@ -498,6 +502,8 @@ define([
       textStyle = yAxis && yAxis.textStyle;
       nameTextStyle = yAxis && yAxis.nameTextStyle;
       format = yAxis && yAxis.format;
+      yMin = yAxis && yAxis.min;
+      yMax = yAxis && yAxis.max;
 
       titleColor = nameTextStyle && nameTextStyle.color;
       labelColor = textStyle && textStyle.color;
@@ -523,6 +529,12 @@ define([
       if(typeof digitSeparator !== 'undefined'){
         this.vAxisSeparator.setState(digitSeparator);
       }
+      if(typeof yMin !== 'undefined') {
+        this.vAxisMin.set('value', yMin)
+      }
+      if(typeof yMax !== 'undefined') {
+        this.vAxisMax.set('value', yMax)
+      }
 
       show = xAxis && xAxis.show;
       show = typeof show === 'undefined' ? true : show;
@@ -532,6 +544,8 @@ define([
       textStyle = xAxis && xAxis.textStyle;
       nameTextStyle = xAxis && xAxis.nameTextStyle;
       format = xAxis && xAxis.format;
+      xMin = xAxis && xAxis.min;
+      xMax = xAxis && xAxis.max;
 
       titleColor = nameTextStyle && nameTextStyle.color;
       labelColor = textStyle && textStyle.color;
@@ -556,6 +570,12 @@ define([
       }
       if(typeof digitSeparator !== 'undefined'){
         this.hAxisSeparator.setState(digitSeparator);
+      }
+      if(typeof xMin !== 'undefined') {
+        this.hAxisMin.set('value', xMin)
+      }
+      if(typeof xMax !== 'undefined') {
+        this.hAxisMax.set('value', xMax)
       }
 
       show = dataLabel && dataLabel.show;
@@ -655,6 +675,7 @@ define([
       var xAxis = {
         textStyle: {}
       };
+      var xValueAxis = utils.isValueAxis(false, type);
       xAxis.show = this.horTogglePocket.getState();
       var xName = this.horTitle.get('value');
       if (xName) {
@@ -667,8 +688,6 @@ define([
 
       //format type
       var xFormat = {};
-
-      var xValueAxis = utils.isValueAxis(false, type);
 
       if(xValueAxis){
         var isXIntType = this.hAxisKeepIntScale.getState();
@@ -685,11 +704,23 @@ define([
       }
 
       xAxis.format = xFormat;
+      // min/max
+      if(xValueAxis) {
+        var xMin = this.hAxisMin.get('value')
+        var xMax = this.hAxisMax.get('value')
+        if(!isNaN(xMin) && typeof xMin === 'number') {
+          xAxis.min = xMin
+        }
+        if(!isNaN(xMax) && typeof xMax === 'number') {
+          xAxis.max = xMax
+        }
+      }
       enumValues.xAxis = xAxis;
       //yAxis
       var yAxis = {
         textStyle: {}
       };
+      var yValueAxis = utils.isValueAxis(true, type);
       yAxis.show = this.verTogglePocket.getState();
       var yName = this.verTitle.get('value');
       if (yName) {
@@ -702,8 +733,6 @@ define([
 
       //format type
       var yFormat = {};
-      var yValueAxis = utils.isValueAxis(true, type);
-
       if(yValueAxis){
         var isYIntType = this.vAxisKeepIntScale.getState();
         yFormat.type = isYIntType ? 'int' : 'float';
@@ -717,6 +746,17 @@ define([
       }
 
       yAxis.format = yFormat;
+      // min/max
+      if(yValueAxis) {
+        var yMin = this.vAxisMin.get('value')
+        var yMax = this.vAxisMax.get('value')
+        if(!isNaN(yMin) && typeof yMin === 'number') {
+          yAxis.min = yMin
+        }
+        if(!isNaN(yMax) && typeof yMax == 'number') {
+          yAxis.max = yMax
+        }
+      }
       enumValues.yAxis = yAxis;
 
       //data labels
@@ -1203,6 +1243,21 @@ define([
       }
     },
 
+    _updateAxisRangeSettingDisplay: function() {
+      var vertivcalValid = this._isValueAxis(true, this.keyProperties.type);
+      var horizontalValid = this._isValueAxis(false, this.keyProperties.type);
+      if (vertivcalValid) {
+        this._updateAxisRangeDisplay(true, true);
+      } else {
+        this._updateAxisRangeDisplay(true, false);
+      }
+      if (horizontalValid) {
+        this._updateAxisRangeDisplay(false, true);
+      } else {
+        this._updateAxisRangeDisplay(false, false);
+      }
+    },
+
     _clusterFieldChangeTriggerForNumberOption: function(clusterField) {
       this._updateNumberOptionDisplay(clusterField);
     },
@@ -1299,6 +1354,14 @@ define([
       }
     },
 
+    _updateAxisRangeDisplay: function(isVertical, show) {
+      if (show) {
+        this._showAxisRangeRow(isVertical);
+      } else {
+        this._hideAxisRangeRow(isVertical);
+      }
+    },
+
     _updateAxisIntScaleRowDisplay: function(isVertical, show) {
       if (show) {
         this._showAxisKeepIntScaleRow(isVertical);
@@ -1339,6 +1402,26 @@ define([
       }
     },
 
+    _showAxisRangeRow: function(isVertical) {
+      if (isVertical) {
+        html.removeClass(this.vAxisMinRow, 'hide');
+        html.removeClass(this.vAxisMaxRow, 'hide');
+      } else {
+        html.removeClass(this.hAxisMinRow, 'hide');
+        html.removeClass(this.hAxisMaxRow, 'hide');
+      }
+    },
+
+    _hideAxisRangeRow: function(isVertical) {
+      if (isVertical) {
+        html.addClass(this.vAxisMinRow, 'hide');
+        html.addClass(this.vAxisMaxRow, 'hide');
+      } else {
+        html.addClass(this.hAxisMinRow, 'hide');
+        html.addClass(this.hAxisMaxRow, 'hide');
+      }
+    },
+
     _showSectionItem: function(itemDom) {
       html.removeClass(itemDom, 'hide');
     },
@@ -1351,6 +1434,13 @@ define([
     _shouldValueFieldAsSingleMode: function(mode) {
       var type = this.keyProperties.type;
       return (mode === 'feature' || mode === 'category') && type === 'pie';
+    },
+
+    _isValueAxis: function(isVertical, type) {
+      if (!utils.isAxisType(type)) {
+        return;
+      }
+      return utils.isValueAxis(isVertical, type);
     },
 
     _isNumberOptionValid: function(isVertical, clusterField, type) {

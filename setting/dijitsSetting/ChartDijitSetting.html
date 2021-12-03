@@ -155,6 +155,14 @@
       <div data-dojo-attach-point="hAxisSeparatorRow" class="average-align">
         <div class="left-label textOverFlow" title="${nls.use1000Separator}">${nls.use1000Separator}</div>
       </div>
+      <div data-dojo-attach-point="hAxisMinRow" class="average-align">
+        <div class="left-label textOverFlow" title="${nls.min}">${nls.min}</div>
+        <input data-dojo-attach-point="hAxisMin" data-dojo-type="dijit/form/NumberSpinner"  data-dojo-props="intermediateChanges:true" data-dojo-attach-event="blur:onChange" />
+      </div>
+      <div data-dojo-attach-point="hAxisMaxRow" class="average-align">
+        <div class="left-label textOverFlow" title="${nls.max}">${nls.max}</div>
+        <input data-dojo-attach-point="hAxisMax" data-dojo-type="dijit/form/NumberSpinner"  data-dojo-props="intermediateChanges:true" data-dojo-attach-event="blur:onChange" />
+      </div>
     </div>
 
     <div data-dojo-attach-point="verTogglePocketContent">
@@ -178,6 +186,14 @@
       </div>
       <div data-dojo-attach-point="vAxisSeparatorRow" class="average-align">
         <div class="left-label textOverFlow" title="${nls.use1000Separator}">${nls.use1000Separator}</div>
+      </div>
+      <div data-dojo-attach-point="vAxisMinRow" class="average-align">
+        <div class="left-label textOverFlow" title="${nls.min}">${nls.min}</div>
+        <input data-dojo-attach-point="vAxisMin" data-dojo-type="dijit/form/NumberSpinner"  data-dojo-props="intermediateChanges:true" data-dojo-attach-event="blur:onChange" />
+      </div>
+      <div data-dojo-attach-point="vAxisMaxRow" class="average-align">
+        <div class="left-label textOverFlow" title="${nls.max}">${nls.max}</div>
+        <input data-dojo-attach-point="vAxisMax" data-dojo-type="dijit/form/NumberSpinner"  data-dojo-props="intermediateChanges:true" data-dojo-attach-event="blur:onChange" />
       </div>
     </div>
 
